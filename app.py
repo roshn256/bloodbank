@@ -13,6 +13,7 @@ from pymongo import MongoClient, GEOSPHERE
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
 import certifi
+from pymongo import MongoClient
 
 from models import db, Event, Donor
 # Initialize Flask app
