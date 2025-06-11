@@ -12,6 +12,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from pymongo import MongoClient, GEOSPHERE
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
+import certifi
 
 from models import db, Event, Donor
 # Initialize Flask app
@@ -33,8 +34,11 @@ app.config.update(
 )
 
 # MongoDB setup
-client = MongoClient(app.config['MONGO_URI'])
-db = client[app.config['DB_NAME']]
+client = MongoClient(
+    app.config['MONGO_URI'],
+    tls=True,
+    tlsCAFile=certifi.where()
+)db = client[app.config['DB_NAME']]
 users_col = db.users
 requests_col = db.requests
 spam_queue_col = db.spam_queue
