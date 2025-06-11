@@ -1,14 +1,24 @@
-Flask
-tensorflow
-opencv-python
-numpy
-pillow
-pynput
-flask-socketio
-pymongo
-python-dotenv
-reportlab
-flask
-flask-sqlalchemy
-gunicorn
-flask_login
+# --- core ---
+Flask==3.1.2
+gunicorn==22.0.0
+
+# --- real-time & sockets ---
+Flask-SocketIO==5.3.6
+
+# --- database ---
+pymongo[srv,tls]==4.7.2      # SRV + TLS extras
+dnspython==2.6.1             # needed for mongodb+srv URIs
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.3
+
+# --- ML / CV (works on Python 3.11) ---
+tensorflow==2.16.1
+opencv-python==4.10.0.0
+numpy==1.26.4
+Pillow==10.3.0
+
+# --- misc ---
+pynput==1.7.7
+python-dotenv==1.0.1
+reportlab==4.2.0
+certifi==2025.5.25           # fresh root-CA bundle
