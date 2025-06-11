@@ -1,5 +1,5 @@
 {
-    "MONGO_URI": "mongodb://localhost:27017",
+    "MONGO_URI": "mongodb+srv://joyroshn:ODj36Wt21UXRNcM4@cluster0.t9jvbrr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     "DB_NAME": "engagement_db",
     "SMTP_SERVER": "smtp.gmail.com",
     "SMTP_PORT": 465,
