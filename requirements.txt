@@ -3,7 +3,6 @@ tensorflow
 opencv-python
 numpy
 pillow
-pyaudio
 pynput
 flask-socketio
 pymongo
