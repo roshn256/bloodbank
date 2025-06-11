@@ -38,7 +38,9 @@ client = MongoClient(
     app.config['MONGO_URI'],
     tls=True,
     tlsCAFile=certifi.where()
-)db = client[app.config['DB_NAME']]
+)
+
+db = client[app.config['DB_NAME']]
 users_col = db.users
 requests_col = db.requests
 spam_queue_col = db.spam_queue
