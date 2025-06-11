@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BloodConnect | Admin Panel</title>
+    
+    <!-- Google Fonts & Font Awesome -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --primary-dark: #b71c1c;
+            --primary-light: #ffebee;
+            --secondary: #4caf50;
+            --accent: #ff9800;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #4caf50;
+            --warning: #ffc107;
+            --danger: #f44336;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f9fafc;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .welcome-section h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .welcome-section p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .admin-btn {
+            color: var(--primary);
+            background: var(--primary-light);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
+        }
+
+        .admin-btn:hover {
+            background: #ffcdd2;
+            transform: translateY(-2px);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.25);
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #9e1616);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(211, 47, 47, 0.35);
+        }
+
+        /* Tabs Navigation */
+        .tabs-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .tabs-nav {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid var(--light-gray);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 18px 20px;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 1.1rem;
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+
+        /* Stats Summary */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            border-top: 4px solid var(--primary);
+        }
+
+        .summary-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 5px 0;
+        }
+
+        .summary-label {
+            font-size: 1rem;
+            color: var(--gray);
+        }
+
+        /* User Management */
+        .user-table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th {
+            background: var(--primary-light);
+            padding: 15px 20px;
+            text-align: left;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--light-gray);
+            position: sticky;
+            top: 0;
+        }
+
+        .user-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--light-gray);
+            color: var(--gray);
+        }
+
+        .user-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-table tr:hover {
+            background-color: #fff5f5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .active-badge {
+            background: #e8f5e9;
+            color: var(--success);
+        }
+
+        .banned-badge {
+            background: #ffebee;
+            color: var(--danger);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .view-btn {
+            background: var(--light-gray);
+            color: var(--dark);
+        }
+
+        .view-btn:hover {
+            background: #dcdcdc;
+        }
+
+        .ban-btn {
+            background: #ffebee;
+            color: var(--danger);
+        }
+
+        .ban-btn:hover {
+            background: #ffcdd2;
+        }
+
+        .unban-btn {
+            background: #e8f5e9;
+            color: var(--success);
+        }
+
+        .unban-btn:hover {
+            background: #c8e6c9;
+        }
+
+        /* Spam Queue */
+        .spam-queue {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .queue-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .queue-item:last-child {
+            border-bottom: none;
+        }
+
+        .queue-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .queue-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .ip-address {
+            background: #f1f1f1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .queue-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .approve-btn {
+            background: var(--success);
+            color: white;
+        }
+
+        .reject-btn {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .block-btn {
+            background: var(--danger);
+            color: white;
+        }
+
+        .queue-btn {
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .queue-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Global Alerts */
+        .alerts-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+        }
+
+        .alert-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .send-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .send-btn:hover {
+            background: #3d8b40;
+        }
+
+        .emergency-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .emergency-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* System Metrics */
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+        }
+
+        .metric-header {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: var(--success);
+            color: white;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.error {
+            background: var(--danger);
+        }
+        
+        .toast.warning {
+            background: var(--warning);
+            color: #333;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .admin-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .tabs-nav {
+                flex-direction: column;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .queue-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .queue-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Notification Toast -->
+        <div class="toast" id="notificationToast">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage">Operation completed successfully!</span>
+        </div>
+        
+        <!-- Admin Header -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h1>Admin Dashboard</h1>
+                <p>System Management & User Administration</p>
+            </div>
+            <div class="admin-actions">
+                <button class="admin-btn" onclick="showToast('System settings updated!', 'success')">
+                    <i class="fas fa-cog"></i> System Settings
+                </button>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="tabs-container">
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="users">
+                    <i class="fas fa-users"></i> User Management
+                </button>
+                <button class="tab-btn" data-tab="spam">
+                    <i class="fas fa-flag"></i> Spam Queue
+                </button>
+                <button class="tab-btn" data-tab="alerts">
+                    <i class="fas fa-bell"></i> Global Alerts
+                </button>
+                <button class="tab-btn" data-tab="metrics">
+                    <i class="fas fa-chart-bar"></i> System Metrics
+                </button>
+            </div>
+
+            <!-- User Management Tab -->
+            <div class="tab-content active" id="users">
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <div>
+                        <button class="admin-btn" onclick="exportData()">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="stats-summary">
+                    <div class="summary-card">
+                        <i class="fas fa-user summary-icon"></i>
+                        <div class="summary-value" id="donorsCount">0</div>
+                        <div class="summary-label">Total Donors</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-building summary-icon"></i>
+                        <div class="summary-value" id="orgsCount">0</div>
+                        <div class="summary-label">Organizations</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-hospital summary-icon"></i>
+                        <div class="summary-value" id="hospitalsCount">0</div>
+                        <div class="summary-label">Hospitals</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-ban summary-icon"></i>
+                        <div class="summary-value" id="bannedCount">0</div>
+                        <div class="summary-label">Banned Users</div>
+                    </div>
+                </div>
+                
+                <!-- User Tabs -->
+                <div class="tabs-container" style="margin-top: 20px;">
+                    <div class="tabs-nav" style="background: #f8f9fa;">
+                        <button class="tab-btn active" data-subtab="donors">
+                            Donors
+                        </button>
+                        <button class="tab-btn" data-subtab="orgs">
+                            Organizations
+                        </button>
+                        <button class="tab-btn" data-subtab="hospitals">
+                            Hospitals
+                        </button>
+                    </div>
+                    
+                    <!-- Donors Tab -->
+                    <div class="tab-content active" id="donors">
+                        <div class="user-table-container">
+                            <table class="user-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Contact</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="donorsTableBody">
+                                    <!-- Donors will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Organizations Tab -->
+                    <div class="tab-content" id="orgs">
+                        <div class="user-table-container">
+                            <table class="user-table">
+                                <thead>
+                                    <tr>
+                                        <th>Organization</th>
+                                        <th>Contact</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orgsTableBody">
+                                    <!-- Organizations will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Hospitals Tab -->
+                    <div class="tab-content" id="hospitals">
+                        <div class="user-table-container">
+                            <table class="user-table">
+                                <thead>
+                                    <tr>
+                                        <th>Hospital</th>
+                                        <th>Contact</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hospitalsTableBody">
+                                    <!-- Hospitals will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spam Queue Tab -->
+            <div class="tab-content" id="spam">
+                <div class="section-header">
+                    <h2>Spam & Fake Account Queue</h2>
+                    <div>
+                        <button class="admin-btn" onclick="refreshSpamQueue()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="spam-queue" id="spamQueueContainer">
+                    <!-- Spam items will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Global Alerts Tab -->
+            <div class="tab-content" id="alerts">
+                <div class="section-header">
+                    <h2>Global Alert System</h2>
+                </div>
+                
+                <div class="alerts-container">
+                    <div class="alert-form">
+                        <div class="form-group">
+                            <label class="form-label">Alert Type</label>
+                            <select class="form-select" id="alertType">
+                                <option>Email Notification</option>
+                                <option>SMS Alert</option>
+                                <option>In-App Notification</option>
+                                <option>All Channels</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Target Audience</label>
+                            <select class="form-select" id="targetAudience">
+                                <option>All Users</option>
+                                <option>Donors Only</option>
+                                <option>Organizations Only</option>
+                                <option>Hospitals Only</option>
+                                <option>Specific Region</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Priority Level</label>
+                            <select class="form-select" id="priorityLevel">
+                                <option>Normal</option>
+                                <option>High Priority</option>
+                                <option>Emergency</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <input type="text" class="form-input" id="alertSubject" placeholder="Alert subject" value="Urgent Blood Donation Needed">
+                        </div>
+                        
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-textarea" id="alertMessage" placeholder="Type your alert message here...">URGENT: Blood supplies are critically low for type O-negative. All eligible donors in the New York area are requested to donate immediately. Your donation can save lives!</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="emergency-btn" onclick="sendEmergencyAlert()">
+                            <i class="fas fa-bolt"></i> EMERGENCY ALL
+                        </button>
+                        <button class="send-btn" onclick="sendAlert()">
+                            <i class="fas fa-paper-plane"></i> Send Alert
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Metrics Tab -->
+            <div class="tab-content" id="metrics">
+                <div class="section-header">
+                    <h2>System Metrics & Analytics</h2>
+                </div>
+                
+                <div class="stats-summary">
+                    <div class="summary-card">
+                        <i class="fas fa-users summary-icon"></i>
+                        <div class="summary-value" id="totalUsers">0</div>
+                        <div class="summary-label">Total Users</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-tint summary-icon"></i>
+                        <div class="summary-value">2,865</div>
+                        <div class="summary-label">Blood Requests</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-bell summary-icon"></i>
+                        <div class="summary-value">24</div>
+                        <div class="summary-label">Active Alerts</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-shield-alt summary-icon"></i>
+                        <div class="summary-value">98.7%</div>
+                        <div class="summary-label">System Uptime</div>
+                    </div>
+                </div>
+                
+                <div class="metrics-container">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="fas fa-chart-line"></i> User Growth
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="fas fa-chart-pie"></i> User Distribution
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="fas fa-map-marker-alt"></i> Regional Activity
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="regionalChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="fas fa-exclamation-triangle"></i> System Alerts
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="alertsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Database setup using IndexedDB
+        const DB = {
+            db: null,
+            
+            init: function() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open('BloodConnectDB', 1);
+                    
+                    request.onerror = (event) => {
+                        console.error('Database error:', event.target.error);
+                        reject(event.target.error);
+                    };
+                    
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        
+                        // Create object stores
+                        if (!db.objectStoreNames.contains('users')) {
+                            const usersStore = db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
+                            usersStore.createIndex('type', 'type', { unique: false });
+                            usersStore.createIndex('status', 'status', { unique: false });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('spamQueue')) {
+                            const spamStore = db.createObjectStore('spamQueue', { keyPath: 'id', autoIncrement: true });
+                            spamStore.createIndex('email', 'email', { unique: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('alerts')) {
+                            db.createObjectStore('alerts', { keyPath: 'id', autoIncrement: true });
+                        }
+                    };
+                    
+                    request.onsuccess = (event) => {
+                        this.db = event.target.result;
+                        this.populateInitialData().then(resolve).catch(reject);
+                    };
+                });
+            },
+            
+            populateInitialData: function() {
+                return new Promise((resolve, reject) => {
+                    const users = [
+                        // Donors
+                        {name: "Sarah Johnson", email: "sarah@email.com", phone: "(555) 123-4567", location: "New York, NY", type: "donor", status: "active"},
+                        {name: "Michael Chen", email: "michael@email.com", phone: "(555) 987-6543", location: "San Francisco, CA", type: "donor", status: "banned"},
+                        {name: "Emma Rodriguez", email: "emma@email.com", phone: "(555) 456-7890", location: "Chicago, IL", type: "donor", status: "active"},
+                        {name: "James Wilson", email: "james@email.com", phone: "(555) 234-5678", location: "Miami, FL", type: "donor", status: "active"},
+                        {name: "Lisa Thompson", email: "lisa@email.com", phone: "(555) 876-5432", location: "Seattle, WA", type: "donor", status: "active"},
+                        
+                        // Organizations
+                        {name: "Red Cross NY", email: "redcross@email.com", phone: "(212) 555-1234", location: "New York, NY", type: "organization", status: "active"},
+                        {name: "Blood Donors CA", email: "bloodca@email.com", phone: "(415) 555-5678", location: "San Francisco, CA", type: "organization", status: "active"},
+                        
+                        // Hospitals
+                        {name: "City General Hospital", email: "cityhospital@email.com", phone: "(212) 555-9012", location: "New York, NY", type: "hospital", status: "active"},
+                        {name: "Westside Medical", email: "westmedical@email.com", phone: "(415) 555-3456", location: "San Francisco, CA", type: "hospital", status: "active"}
+                    ];
+                    
+                    const spamQueue = [
+                        {email: "john.doe@example.com", date: "2023-06-05 14:23:11", ip: "192.168.1.101"},
+                        {email: "blood_donor123@mail.com", date: "2023-06-06 09:45:22", ip: "104.28.243.78"},
+                        {email: "fake_account@domain.com", date: "2023-06-07 17:31:05", ip: "76.223.126.42"},
+                        {email: "spammer123@example.net", date: "2023-06-08 11:12:34", ip: "142.250.190.78"}
+                    ];
+                    
+                    // Start transaction
+                    const transaction = this.db.transaction(['users', 'spamQueue'], 'readwrite');
+                    
+                    // Add users
+                    const usersStore = transaction.objectStore('users');
+                    usersStore.count().onsuccess = (event) => {
+                        if (event.target.result === 0) {
+                            users.forEach(user => {
+                                usersStore.add(user);
+                            });
+                        }
+                    };
+                    
+                    // Add spam items
+                    const spamStore = transaction.objectStore('spamQueue');
+                    spamStore.count().onsuccess = (event) => {
+                        if (event.target.result === 0) {
+                            spamQueue.forEach(item => {
+                                spamStore.add(item);
+                            });
+                        }
+                    };
+                    
+                    transaction.oncomplete = () => resolve();
+                    transaction.onerror = (event) => reject(event.target.error);
+                });
+            },
+            
+            getUsers: function() {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['users'], 'readonly');
+                    const store = transaction.objectStore('users');
+                    const request = store.getAll();
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            },
+            
+            getUser: function(id) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['users'], 'readonly');
+                    const store = transaction.objectStore('users');
+                    const request = store.get(parseInt(id));
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            },
+            
+            updateUser: function(id, updates) {
+                return new Promise((resolve, reject) => {
+                    this.getUser(id).then(user => {
+                        if (!user) {
+                            reject(new Error('User not found'));
+                            return;
+                        }
+                        
+                        const updatedUser = {...user, ...updates};
+                        const transaction = this.db.transaction(['users'], 'readwrite');
+                        const store = transaction.objectStore('users');
+                        const request = store.put(updatedUser);
+                        
+                        request.onsuccess = () => resolve(updatedUser);
+                        request.onerror = (event) => reject(event.target.error);
+                    });
+                });
+            },
+            
+            getSpamQueue: function() {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['spamQueue'], 'readonly');
+                    const store = transaction.objectStore('spamQueue');
+                    const request = store.getAll();
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            },
+            
+            removeFromSpamQueue: function(id) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['spamQueue'], 'readwrite');
+                    const store = transaction.objectStore('spamQueue');
+                    const request = store.delete(parseInt(id));
+                    
+                    request.onsuccess = () => resolve();
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            },
+            
+            addAlert: function(alert) {
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction(['alerts'], 'readwrite');
+                    const store = transaction.objectStore('alerts');
+                    const request = store.add(alert);
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+        };
+        
+        // Tab switching functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Update data when switching to metrics tab
+                if (tabId === 'metrics') {
+                    updateMetrics();
+                }
+            });
+        });
+
+        // Subtabs for user management
+        document.querySelectorAll('[data-subtab]').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all subtabs
+                document.querySelectorAll('[data-subtab]').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked subtab
+                button.classList.add('active');
+                const subtabId = button.getAttribute('data-subtab');
+                document.getElementById(subtabId).classList.add('active');
+            });
+        });
+        
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('notificationToast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.className = 'toast';
+            
+            if (type === 'error') {
+                toast.classList.add('error');
+            } else if (type === 'warning') {
+                toast.classList.add('warning');
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Render user tables
+        async function renderUserTables() {
+            try {
+                const users = await DB.getUsers();
+                
+                // Count stats
+                const donors = users.filter(u => u.type === 'donor');
+                const orgs = users.filter(u => u.type === 'organization');
+                const hospitals = users.filter(u => u.type === 'hospital');
+                const banned = users.filter(u => u.status === 'banned');
+                
+                document.getElementById('donorsCount').textContent = donors.length;
+                document.getElementById('orgsCount').textContent = orgs.length;
+                document.getElementById('hospitalsCount').textContent = hospitals.length;
+                document.getElementById('bannedCount').textContent = banned.length;
+                document.getElementById('totalUsers').textContent = users.length;
+                
+                // Render donors table
+                const donorsTable = document.getElementById('donorsTableBody');
+                donorsTable.innerHTML = '';
+                
+                donors.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <strong>${user.name}</strong><br>
+                            <small>${user.email}</small>
+                        </td>
+                        <td>${user.phone}</td>
+                        <td>${user.location}</td>
+                        <td>
+                            <span class="status-badge ${user.status === 'active' ? 'active-badge' : 'banned-badge'}">
+                                ${user.status === 'active' ? 'Active' : 'Banned'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn view-btn" onclick="viewUser(${user.id})">View</button>
+                                ${user.status === 'active' ? 
+                                    `<button class="action-btn ban-btn" onclick="banUser(${user.id})">Ban</button>` : 
+                                    `<button class="action-btn unban-btn" onclick="unbanUser(${user.id})">Unban</button>`}
+                            </div>
+                        </td>
+                    `;
+                    donorsTable.appendChild(row);
+                });
+                
+                // Render organizations table
+                const orgsTable = document.getElementById('orgsTableBody');
+                orgsTable.innerHTML = '';
+                
+                orgs.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <strong>${user.name}</strong><br>
+                            <small>${user.email}</small>
+                        </td>
+                        <td>${user.phone}</td>
+                        <td>${user.location}</td>
+                        <td>
+                            <span class="status-badge ${user.status === 'active' ? 'active-badge' : 'banned-badge'}">
+                                ${user.status === 'active' ? 'Active' : 'Banned'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn view-btn" onclick="viewUser(${user.id})">View</button>
+                                ${user.status === 'active' ? 
+                                    `<button class="action-btn ban-btn" onclick="banUser(${user.id})">Ban</button>` : 
+                                    `<button class="action-btn unban-btn" onclick="unbanUser(${user.id})">Unban</button>`}
+                            </div>
+                        </td>
+                    `;
+                    orgsTable.appendChild(row);
+                });
+                
+                // Render hospitals table
+                const hospitalsTable = document.getElementById('hospitalsTableBody');
+                hospitalsTable.innerHTML = '';
+                
+                hospitals.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <strong>${user.name}</strong><br>
+                            <small>${user.email}</small>
+                        </td>
+                        <td>${user.phone}</td>
+                        <td>${user.location}</td>
+                        <td>
+                            <span class="status-badge ${user.status === 'active' ? 'active-badge' : 'banned-badge'}">
+                                ${user.status === 'active' ? 'Active' : 'Banned'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn view-btn" onclick="viewUser(${user.id})">View</button>
+                                ${user.status === 'active' ? 
+                                    `<button class="action-btn ban-btn" onclick="banUser(${user.id})">Ban</button>` : 
+                                    `<button class="action-btn unban-btn" onclick="unbanUser(${user.id})">Unban</button>`}
+                            </div>
+                        </td>
+                    `;
+                    hospitalsTable.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showToast('Failed to load user data', 'error');
+            }
+        }
+        
+        // Render spam queue
+        async function renderSpamQueue() {
+            try {
+                const spamQueue = await DB.getSpamQueue();
+                const container = document.getElementById('spamQueueContainer');
+                container.innerHTML = '';
+                
+                spamQueue.forEach(item => {
+                    const queueItem = document.createElement('div');
+                    queueItem.className = 'queue-item';
+                    queueItem.innerHTML = `
+                        <div class="queue-info">
+                            <h3>${item.email}</h3>
+                            <p>Registered: ${item.date}</p>
+                            <p>IP: <span class="ip-address">${item.ip}</span></p>
+                        </div>
+                        <div class="queue-actions">
+                            <button class="queue-btn approve-btn" onclick="approveSpamItem(${item.id})">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="queue-btn reject-btn" onclick="rejectSpamItem(${item.id})">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                            <button class="queue-btn block-btn" onclick="blockSpamItem(${item.id})">
+                                <i class="fas fa-ban"></i> Block IP
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(queueItem);
+                });
+            } catch (error) {
+                console.error('Error loading spam queue:', error);
+                showToast('Failed to load spam queue', 'error');
+            }
+        }
+        
+        // User management functions
+        async function viewUser(id) {
+            try {
+                const user = await DB.getUser(id);
+                if (user) {
+                    showToast(`Viewing details for: ${user.name}`, 'success');
+                    // In a real app, you would show a modal with full details
+                }
+            } catch (error) {
+                showToast('Failed to load user details', 'error');
+            }
+        }
+        
+        async function banUser(id) {
+            try {
+                await DB.updateUser(id, {status: 'banned'});
+                await renderUserTables();
+                showToast('User has been banned', 'success');
+            } catch (error) {
+                showToast('Failed to ban user', 'error');
+            }
+        }
+        
+        async function unbanUser(id) {
+            try {
+                await DB.updateUser(id, {status: 'active'});
+                await renderUserTables();
+                showToast('User has been unbanned', 'success');
+            } catch (error) {
+                showToast('Failed to unban user', 'error');
+            }
+        }
+        
+        // Spam queue functions
+        async function approveSpamItem(id) {
+            try {
+                await DB.removeFromSpamQueue(id);
+                await renderSpamQueue();
+                showToast('Registration approved', 'success');
+            } catch (error) {
+                showToast('Failed to approve registration', 'error');
+            }
+        }
+        
+        async function rejectSpamItem(id) {
+            try {
+                await DB.removeFromSpamQueue(id);
+                await renderSpamQueue();
+                showToast('Registration rejected', 'warning');
+            } catch (error) {
+                showToast('Failed to reject registration', 'error');
+            }
+        }
+        
+        async function blockSpamItem(id) {
+            try {
+                await DB.removeFromSpamQueue(id);
+                await renderSpamQueue();
+                showToast('IP address has been blocked', 'success');
+            } catch (error) {
+                showToast('Failed to block IP address', 'error');
+            }
+        }
+        
+        async function refreshSpamQueue() {
+            await renderSpamQueue();
+            showToast('Spam queue refreshed', 'success');
+        }
+        
+        // Alert system functions
+        async function sendAlert() {
+            const subject = document.getElementById('alertSubject').value;
+            const message = document.getElementById('alertMessage').value;
+            const type = document.getElementById('alertType').value;
+            const audience = document.getElementById('targetAudience').value;
+            const priority = document.getElementById('priorityLevel').value;
+            
+            try {
+                // Save alert to database
+                const alert = {
+                    subject,
+                    message,
+                    type,
+                    audience,
+                    priority,
+                    timestamp: new Date().toISOString()
+                };
+                
+                await DB.addAlert(alert);
+                showToast(`Alert sent to ${audience} via ${type}`, 'success');
+            } catch (error) {
+                showToast('Failed to send alert', 'error');
+            }
+        }
+        
+        function sendEmergencyAlert() {
+            if (confirm('Are you sure you want to send an EMERGENCY ALERT to ALL users?')) {
+                showToast('EMERGENCY ALERT sent to all users!', 'success');
+            }
+        }
+        
+        // Export function
+        function exportData() {
+            showToast('Data exported successfully!', 'success');
+        }
+        
+        // Metrics functions
+        async function updateMetrics() {
+            try {
+                const users = await DB.getUsers();
+                document.getElementById('totalUsers').textContent = users.length;
+            } catch (error) {
+                console.error('Error updating metrics:', error);
+            }
+        }
+        
+        function logout() {
+            showToast('You have been logged out', 'success');
+            setTimeout(() => {
+                window.location.href = "/logout";
+            }, 1500);
+        }
+        
+        // Initialize charts
+        async function initCharts() {
+            // User Growth Chart
+            const growthCtx = document.getElementById('growthChart').getContext('2d');
+            new Chart(growthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'New Users',
+                        data: [120, 190, 150, 220, 180, 250],
+                        fill: true,
+                        backgroundColor: 'rgba(211, 47, 47, 0.1)',
+                        borderColor: 'rgb(211, 47, 47)',
+                        tension: 0.3,
+                        pointBackgroundColor: 'white',
+                        pointBorderColor: 'rgb(211, 47, 47)',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // User Distribution Chart
+            try {
+                const users = await DB.getUsers();
+                const donors = users.filter(u => u.type === 'donor').length;
+                const orgs = users.filter(u => u.type === 'organization').length;
+                const hospitals = users.filter(u => u.type === 'hospital').length;
+                const admins = users.filter(u => u.type === 'admin').length || 3;
+                
+                const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+                new Chart(distributionCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Donors', 'Organizations', 'Hospitals', 'Admins'],
+                        datasets: [{
+                            label: 'User Distribution',
+                            data: [donors, orgs, hospitals, admins],
+                            backgroundColor: [
+                                'rgba(211, 47, 47, 0.7)',
+                                'rgba(244, 67, 54, 0.7)',
+                                'rgba(229, 115, 115, 0.7)',
+                                'rgba(239, 154, 154, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgb(183, 28, 28)',
+                                'rgb(198, 40, 40)',
+                                'rgb(229, 57, 53)',
+                                'rgb(239, 83, 80)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading user data for chart:', error);
+            }
+
+            // Regional Activity Chart
+            const regionalCtx = document.getElementById('regionalChart').getContext('2d');
+            new Chart(regionalCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['New York', 'California', 'Texas', 'Florida', 'Illinois'],
+                    datasets: [{
+                        label: 'Active Users',
+                        data: [420, 380, 290, 210, 180],
+                        backgroundColor: 'rgba(211, 47, 47, 0.7)',
+                        borderColor: 'rgb(183, 28, 28)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // System Alerts Chart
+            const alertsCtx = document.getElementById('alertsChart').getContext('2d');
+            new Chart(alertsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Info', 'Warnings', 'Errors', 'Critical'],
+                    datasets: [{
+                        label: 'System Alerts',
+                        data: [120, 85, 42, 18],
+                        backgroundColor: [
+                            'rgba(76, 175, 80, 0.7)',
+                            'rgba(255, 193, 7, 0.7)',
+                            'rgba(244, 67, 54, 0.7)',
+                            'rgba(183, 28, 28, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(56, 142, 60)',
+                            'rgb(198, 147, 0)',
+                            'rgb(198, 40, 40)',
+                            'rgb(136, 14, 79)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize the dashboard when the page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await DB.init();
+                await renderUserTables();
+                await renderSpamQueue();
+                await initCharts();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showToast('Failed to initialize application', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

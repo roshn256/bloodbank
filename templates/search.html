@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BloodConnect | Find Blood Donors</title>
+    
+    <!-- Google Fonts & Font Awesome -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    
+    <!-- Leaflet CSS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --primary-dark: #b71c1c;
+            --primary-light: #ffebee;
+            --secondary: #4caf50;
+            --accent: #ff9800;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #4caf50;
+            --warning: #ffc107;
+            --danger: #f44336;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f9fafc;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .welcome-section h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .welcome-section p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.25);
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #9e1616);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(211, 47, 47, 0.35);
+        }
+
+        /* Search Form */
+        .search-form {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+
+        .search-header {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .filter-input {
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .radius-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .radius-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--light-gray);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .search-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .reset-btn {
+            background: var(--light-gray);
+            color: var(--gray);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .reset-btn:hover {
+            background: #dcdcdc;
+        }
+
+        /* Results Section */
+        .results-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .results-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .results-tab {
+            flex: 1;
+            padding: 18px 20px;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 1.1rem;
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .results-tab:hover {
+            color: var(--primary);
+        }
+
+        .results-tab.active {
+            color: var(--primary);
+        }
+
+        .results-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Donor Cards */
+        .donor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .donor-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            border: 1px solid var(--light-gray);
+            position: relative;
+        }
+
+        .donor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .donor-header {
+            background: var(--primary-light);
+            padding: 18px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .donor-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .donor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .donor-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .donor-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .donor-group {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            background: #ffebee;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        .donor-body {
+            padding: 25px;
+        }
+
+        .donor-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+
+        .availability {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .available {
+            background: #e8f5e9;
+            color: var(--success);
+        }
+
+        .unavailable {
+            background: #ffebee;
+            color: var(--danger);
+        }
+
+        .soon {
+            background: #fff8e1;
+            color: var(--warning);
+        }
+
+        .donor-footer {
+            padding: 15px 25px;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .distance {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .contact-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Map View */
+        #map-container {
+            height: 500px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Login Prompt */
+        .login-prompt {
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-top: 30px;
+            font-size: 1.1rem;
+            color: var(--gray);
+        }
+
+        .login-prompt i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .login-prompt h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .login-prompt p {
+            margin-bottom: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .donor-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-tabs {
+                flex-direction: column;
+            }
+            
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h1>Find Blood Donors</h1>
+                <p>Search for donors by blood group and location</p>
+            </div>
+        
+        </div>
+
+        <!-- Search Form -->
+        <div class="search-form">
+            <div class="search-header">
+                <i class="fas fa-search"></i> Search for Blood Donors
+            </div>
+            
+            <div class="search-filters">
+                <div class="filter-group">
+                    <label class="filter-label">Blood Group</label>
+                    <select class="filter-input" id="bloodGroup">
+                        <option value="">Select Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Location</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" class="filter-input" id="locationInput" placeholder="Enter city or zip code">
+                        <button class="search-btn" id="geoBtn" style="white-space: nowrap;">
+                            <i class="fas fa-location-dot"></i> Use My Location
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Search Radius</label>
+                    <div class="radius-slider-container">
+                        <span class="radius-value" id="radiusValue">10 km</span>
+                        <input type="range" min="1" max="100" value="10" class="slider" id="radiusSlider">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-actions">
+                <button class="reset-btn" id="resetBtn">Reset</button>
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i> Search Donors
+                </button>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-container">
+            <div class="results-tabs">
+                <button class="results-tab active" data-tab="list">
+                    <i class="fas fa-list"></i> List View
+                </button>
+                <button class="results-tab" data-tab="map">
+                    <i class="fas fa-map"></i> Map View
+                </button>
+            </div>
+            
+            <!-- List View -->
+            <div class="tab-content active" id="list">
+                <div class="section-header">
+                    <h2>Donors Found: <span id="donorCount">8</span></h2>
+                </div>
+                
+                <!-- Donor Cards -->
+                <div class="donor-grid">
+                    <div class="donor-card">
+                        <div class="donor-header">
+                            <div class="donor-info">
+                                <div class="donor-avatar">JD</div>
+                                <div class="donor-details">
+                                    <div class="donor-name">John D.</div>
+                                    <div class="donor-group">A+</div>
+                                </div>
+                            </div>
+                            <div class="availability available">Available Now</div>
+                        </div>
+                        <div class="donor-body">
+                            <div class="donor-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">Last Donation</div>
+                                    <div class="stat-value">2 months ago</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Donations</div>
+                                    <div class="stat-value">12 times</div>
+                                </div>
+                            </div>
+                            <p>Willing to travel up to 15km to donate. Available on weekends.</p>
+                        </div>
+                        <div class="donor-footer">
+                            <div class="distance"><i class="fas fa-location-dot"></i> 3.2 km away</div>
+                            <button class="contact-btn">
+                                <i class="fas fa-envelope"></i> Contact
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="donor-card">
+                        <div class="donor-header">
+                            <div class="donor-info">
+                                <div class="donor-avatar">MS</div>
+                                <div class="donor-details">
+                                    <div class="donor-name">Maria S.</div>
+                                    <div class="donor-group">O-</div>
+                                </div>
+                            </div>
+                            <div class="availability soon">Available in 1 week</div>
+                        </div>
+                        <div class="donor-body">
+                            <div class="donor-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">Last Donation</div>
+                                    <div class="stat-value">3 months ago</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Donations</div>
+                                    <div class="stat-value">8 times</div>
+                                </div>
+                            </div>
+                            <p>Universal donor. Prefers appointment scheduling. Available on weekday afternoons.</p>
+                        </div>
+                        <div class="donor-footer">
+                            <div class="distance"><i class="fas fa-location-dot"></i> 5.7 km away</div>
+                            <button class="contact-btn">
+                                <i class="fas fa-envelope"></i> Contact
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="donor-card">
+                        <div class="donor-header">
+                            <div class="donor-info">
+                                <div class="donor-avatar">RJ</div>
+                                <div class="donor-details">
+                                    <div class="donor-name">Robert J.</div>
+                                    <div class="donor-group">AB+</div>
+                                </div>
+                            </div>
+                            <div class="availability available">Available Now</div>
+                        </div>
+                        <div class="donor-body">
+                            <div class="donor-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">Last Donation</div>
+                                    <div class="stat-value">4 months ago</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Donations</div>
+                                    <div class="stat-value">5 times</div>
+                                </div>
+                            </div>
+                            <p>Plasma donor. Can travel to nearby hospitals or donation centers.</p>
+                        </div>
+                        <div class="donor-footer">
+                            <div class="distance"><i class="fas fa-location-dot"></i> 2.1 km away</div>
+                            <button class="contact-btn">
+                                <i class="fas fa-envelope"></i> Contact
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="donor-card">
+                        <div class="donor-header">
+                            <div class="donor-info">
+                                <div class="donor-avatar">AK</div>
+                                <div class="donor-details">
+                                    <div class="donor-name">Anita K.</div>
+                                    <div class="donor-group">B-</div>
+                                </div>
+                            </div>
+                            <div class="availability unavailable">Not available</div>
+                        </div>
+                        <div class="donor-body">
+                            <div class="donor-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">Last Donation</div>
+                                    <div class="stat-value">1 month ago</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Donations</div>
+                                    <div class="stat-value">15 times</div>
+                                </div>
+                            </div>
+                            <p>Will be available again next month. Prefers to donate at community centers.</p>
+                        </div>
+                        <div class="donor-footer">
+                            <div class="distance"><i class="fas fa-location-dot"></i> 8.3 km away</div>
+                            <button class="contact-btn">
+                                <i class="fas fa-envelope"></i> Contact
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Login Prompt for Public Visitors -->
+                <div class="login-prompt" id="loginPrompt">
+                    <i class="fas fa-lock"></i>
+                    <h3>Want to contact donors?</h3>
+                    <p>To protect donor privacy, you need to be a registered hospital or organization to contact donors directly. Please log in to access contact information and send messages.</p>
+                    <button class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Log In to Contact Donors
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Map View -->
+            <div class="tab-content" id="map">
+                <div class="section-header">
+                    <h2>Donor Locations</h2>
+                </div>
+                
+                <div id="map-container">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leaflet JS for maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // ---------- Tab switching functionality ----------
+        document.querySelectorAll('.results-tab').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.results-tab').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Initialize map when tab is shown
+                if (tabId === 'map') {
+                    initMap();
+                }
+            });
+        });
+        
+        // ---------- Radius Slider ----------
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusValue = document.getElementById('radiusValue');
+        
+        radiusSlider.addEventListener('input', () => {
+            radiusValue.textContent = `${radiusSlider.value} km`;
+        });
+        
+        // ---------- Geolocation Button ----------
+        document.getElementById('geoBtn').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        document.getElementById('locationInput').value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                        alert('Location captured! Click "Search Donors" to find nearby donors.');
+                    },
+                    error => {
+                        alert('Unable to retrieve your location. Please enter manually.');
+                        console.error('Geolocation error:', error);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser. Please enter manually.');
+            }
+        });
+        
+        // ---------- Reset Button ----------
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('bloodGroup').value = '';
+            document.getElementById('locationInput').value = '';
+            radiusSlider.value = 10;
+            radiusValue.textContent = '10 km';
+        });
+        
+        // ---------- Search Button ----------
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const bloodGroup = document.getElementById('bloodGroup').value;
+            const location = document.getElementById('locationInput').value;
+            const radius = radiusSlider.value;
+            
+            if (!bloodGroup || !location) {
+                alert('Please select a blood group and enter a location.');
+                return;
+            }
+            
+            // Simulate search results
+            document.getElementById('donorCount').textContent = '8';
+            document.getElementById('list').style.display = 'block';
+            document.getElementById('map').style.display = 'none';
+            document.querySelector('.results-tab[data-tab="list"]').classList.add('active');
+            document.querySelector('.results-tab[data-tab="map"]').classList.remove('active');
+            
+            alert(`Searching for ${bloodGroup} donors within ${radius} km of ${location}...`);
+        });
+        
+
+        
+        // ---------- Initialize Map ----------
+        function initMap() {
+            // Create a map centered at a default location
+            const map = L.map('map').setView([51.505, -0.09], 13);
+            
+            // Add the OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add markers for donors (simulated data)
+            const donors = [
+                {name: "John D.", lat: 51.505, lng: -0.09, bloodGroup: "A+", status: "available"},
+                {name: "Maria S.", lat: 51.51, lng: -0.1, bloodGroup: "O-", status: "soon"},
+                {name: "Robert J.", lat: 51.515, lng: -0.09, bloodGroup: "AB+", status: "available"},
+                {name: "Anita K.", lat: 51.52, lng: -0.12, bloodGroup: "B-", status: "unavailable"}
+            ];
+            
+            // Create custom icons
+            const iconColors = {
+                available: 'green',
+                soon: 'orange',
+                unavailable: 'red'
+            };
+            
+            // Add markers to the map
+            donors.forEach(donor => {
+                const icon = L.divIcon({
+                    className: 'custom-icon',
+                    html: `<div style="background: ${iconColors[donor.status]}; 
+                            border-radius: 50%; 
+                            width: 24px; 
+                            height: 24px; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center;
+                            color: white;
+                            font-weight: bold;
+                            border: 2px solid white;
+                            box-shadow: 0 0 10px rgba(0,0,0,0.2);">${donor.bloodGroup}</div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+                
+                const marker = L.marker([donor.lat, donor.lng], {icon: icon}).addTo(map);
+                
+                // Add popup with donor info
+                marker.bindPopup(`
+                    <div style="font-weight: bold; margin-bottom: 5px;">${donor.name}</div>
+                    <div>Blood Group: ${donor.bloodGroup}</div>
+                    <div>Status: <span style="color: ${iconColors[donor.status]}">${donor.status === 'available' ? 'Available' : donor.status === 'soon' ? 'Available Soon' : 'Unavailable'}</span></div>
+                `);
+            });
+        }
+    </script>
+</body>
+</html>

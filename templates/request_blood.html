@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodConnect | Request Blood</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --primary-dark: #b71c1c;
+            --primary-light: #ffebee;
+            --secondary: #4caf50;
+            --accent: #ff9800;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #4caf50;
+            --warning: #ffc107;
+            --danger: #f44336;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #f9fafc 0%, #eef2f6 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+            position: relative;
+            display: inline-block;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .header p {
+            color: var(--gray);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .form-section {
+            padding: 35px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .section-title i {
+            background: var(--primary-light);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.4rem;
+        }
+
+        .section-title h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.6rem;
+            color: var(--dark);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 5px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #9e1616);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(211, 47, 47, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background: #dcdcdc;
+        }
+
+        .map-container {
+            height: 300px;
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 20px,
+                rgba(0,0,0,0.05) 20px,
+                rgba(0,0,0,0.05) 21px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 20px,
+                rgba(0,0,0,0.05) 20px,
+                rgba(0,0,0,0.05) 21px
+            );
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            z-index: 2;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .map-marker::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 7px;
+            left: 7px;
+        }
+
+        .map-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 3;
+            max-width: 400px;
+        }
+
+        .map-overlay p {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .map-overlay i {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        .info-card {
+            background: var(--primary-light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .info-card i {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        .info-content h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .info-content p {
+            color: var(--gray);
+            line-height: 1.7;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: translateY(0);
+            animation: slideUp 0.4s ease;
+        }
+
+        .modal-header {
+            background: var(--primary);
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .modal-header i {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .modal-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.8rem;
+        }
+
+        .modal-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-body p {
+            color: var(--gray);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .modal-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: var(--light-gray);
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-close {
+            background: var(--light-gray);
+            color: var(--gray);
+        }
+
+        .btn-close:hover {
+            background: #dcdcdc;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .modal-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Blood Request Form</h1>
+            <p>Fill out this form to request blood for your patient. We'll immediately notify matching donors in your area.</p>
+        </div>
+        
+        <div class="form-container">
+            <!-- Patient Details Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-user-injured"></i>
+                    <h2>Patient Details</h2>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Patient Full Name</label>
+                        <input type="text" class="form-input" placeholder="Enter patient's full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Patient Age</label>
+                        <input type="number" class="form-input" placeholder="Enter patient's age" min="1" max="120">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Patient Gender</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="gender" value="male" checked>
+                                Male
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="gender" value="female">
+                                Female
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="gender" value="other">
+                                Other
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Blood Requirements Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-tint"></i>
+                    <h2>Blood Requirements</h2>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Required Blood Group</label>
+                        <select class="form-select">
+                            <option value="">Select blood group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Number of Units Required</label>
+                        <input type="number" class="form-input" placeholder="Enter number of units" min="1" max="20" value="2">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Urgency Level</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="urgency" value="normal" checked>
+                                Normal (Within 24 hours)
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="urgency" value="critical">
+                                Critical (Immediate need)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="info-content">
+                        <h3>Important Information</h3>
+                        <p>For critical cases, our system will immediately notify all matching donors within a 20-mile radius. 
+                        Normal requests will be processed within 2 hours. Please ensure all information is accurate.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Location Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h2>Location Details</h2>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Hospital/Organization Name</label>
+                        <input type="text" class="form-input" value="City General Hospital" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <input type="text" class="form-input" value="123 Medical Avenue" placeholder="Enter your address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-input" value="Metropolis" placeholder="Enter your city">
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <div class="map-marker"></div>
+                    <div class="map-overlay">
+                        <p><i class="fas fa-info-circle"></i> Click on the map to update the location</p>
+                        <p><i class="fas fa-location-dot"></i> Current location: City General Hospital</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="form-section">
+                <div class="form-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="btn btn-primary" id="submitRequest">
+                        <i class="fas fa-paper-plane"></i> Submit Blood Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-check-circle"></i>
+                <h2>Request Submitted Successfully!</h2>
+            </div>
+            <div class="modal-body">
+                <p>Your blood request has been submitted. We've found matching donors and notified them immediately.</p>
+                
+                <div class="modal-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">Matching Donors</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Positive Responses</div>
+                    </div>
+                </div>
+                
+                <p>Donors will arrive at your location shortly. You'll receive notifications as donors confirm.</p>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-close" id="closeModal">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-download"></i> Download Request Summary
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission
+        document.getElementById('submitRequest').addEventListener('click', function() {
+            // Simple validation
+            const patientName = document.querySelector('input[type="text"]').value;
+            const bloodGroup = document.querySelector('.form-select').value;
+            
+            if (!patientName || !bloodGroup) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Show confirmation modal
+            document.getElementById('confirmationModal').style.display = 'flex';
+        });
+        
+        // Close modal
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('confirmationModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+        
+        // Simulate map click
+        document.querySelector('.map-container').addEventListener('click', function() {
+            alert('Map location selector would open here. In a real implementation, this would integrate with a mapping service like Google Maps.');
+        });
+    </script>
+</body>
+</html>

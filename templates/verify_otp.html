@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Verify OTP | BloodConnect{% endblock %}
+
+{% block content %}
+<div class="otp-container">
+    <div class="otp-card">
+        <div class="otp-header">
+            <h2>Verify Your Account</h2>
+            <p>We've sent a 6-digit code to <strong>{{ email }}</strong></p>
+        </div>
+
+        <!-- Error Message -->
+        {% if error %}
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ error }}
+            {% if max_retries %}<br>New OTP has been sent automatically{% endif %}
+        </div>
+        {% endif %}
+
+        <form id="otpForm" method="POST" action="{{ url_for('verify_otp', email=email) }}">
+            <input type="hidden" name="email" value="{{ email }}">
+            <input type="hidden" name="otp" id="combinedOtp">
+            
+            <div class="input-group">
+                <label>Enter OTP Code</label>
+                <div class="otp-inputs">
+                    {% for i in range(1, 7) %}
+                    <input type="text" 
+                           id="otp{{ i }}" 
+                           class="otp-digit" 
+                           maxlength="1" 
+                           pattern="\d" 
+                           required
+                           aria-label="OTP digit {{ i }}"
+                           {% if i == 1 %}autofocus{% endif %}>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="verify-btn">
+                <i class="fas fa-shield-check"></i>
+                Verify & Continue
+            </button>
+        </form>
+
+        <div class="resend-section">
+            <p>Didn't receive a code?</p>
+            <div class="resend-controls">
+                <a href="{{ url_for('resend_otp', email=email) }}" 
+                   class="resend-link" 
+                   id="resendLink">
+                    <i class="fas fa-redo-alt"></i>
+                    Resend OTP
+                </a>
+                <span id="countdown" class="countdown"></span>
+            </div>
+        </div>
+        
+        <div class="alternate-actions">
+            <a href="{{ url_for('signup') }}">Change email</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .otp-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #f5f7fb;
+        padding: 1rem;
+    }
+
+    .otp-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 480px;
+    }
+
+    .otp-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .otp-header h2 {
+        color: #e53935; /* Primary red */
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .otp-header p {
+        color: #718096;
+        font-size: 1.1rem;
+    }
+
+    .otp-inputs {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+    .otp-digit {
+        width: 100%;
+        height: 60px;
+        text-align: center;
+        font-size: 1.8rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .otp-digit:focus {
+        border-color: #e53935;
+        box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2);
+        outline: none;
+    }
+
+    .verify-btn {
+        width: 100%;
+        padding: 1rem;
+        background: #e53935;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .verify-btn:hover {
+        background: #c62828; /* Darker red */
+    }
+
+    .resend-section {
+        text-align: center;
+        margin-top: 2rem;
+        color: #718096;
+    }
+
+    .resend-controls {
+        margin-top: 0.5rem;
+    }
+
+    .resend-link {
+        color: #e53935;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .resend-link.disabled {
+        color: #cbd5e0;
+        pointer-events: none;
+    }
+
+    .countdown {
+        display: block;
+        margin-top: 0.5rem;
+        color: #e53e3e;
+        font-weight: 500;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .alternate-actions {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .alternate-actions a {
+        color: #e53935;
+        text-decoration: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+        .otp-card {
+            padding: 1.5rem;
+        }
+        
+        .otp-inputs {
+            gap: 0.5rem;
+        }
+        
+        .otp-digit {
+            height: 50px;
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // OTP inputs handling
+        const otpDigits = document.querySelectorAll('.otp-digit');
+        const combinedOtp = document.getElementById('combinedOtp');
+        
+        // Handle OTP digit inputs
+        otpDigits.forEach((digit, index) => {
+            digit.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    if (index < otpDigits.length - 1) {
+                        otpDigits[index + 1].focus();
+                    }
+                }
+                
+                updateCombinedOtp();
+            });
+            
+            digit.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '') {
+                    if (index > 0) {
+                        otpDigits[index - 1].focus();
+                    }
+                }
+            });
+            
+            digit.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasteData = e.clipboardData.getData('text').trim();
+                if (pasteData.length === 6 && /^\d+$/.test(pasteData)) {
+                    pasteData.split('').forEach((char, charIndex) => {
+                        if (charIndex < otpDigits.length) {
+                            otpDigits[charIndex].value = char;
+                        }
+                    });
+                    otpDigits[5].focus();
+                    updateCombinedOtp();
+                }
+            });
+        });
+        
+        function updateCombinedOtp() {
+            combinedOtp.value = Array.from(otpDigits)
+                .map(input => input.value)
+                .join('');
+        }
+        
+        // Resend OTP functionality
+        let timeLeft = {{ resend_time|default(60, true) }};
+        const countdownElement = document.getElementById('countdown');
+        const resendLink = document.getElementById('resendLink');
+        
+        function updateCountdown() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownElement.textContent = `Resend available in ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                countdownElement.style.display = 'none';
+                resendLink.classList.remove('disabled');
+            } else {
+                timeLeft--;
+            }
+        }
+        
+        // Initialize timer if needed
+        let timer;
+        if (timeLeft > 0) {
+            resendLink.classList.add('disabled');
+            countdownElement.style.display = 'block';
+            timer = setInterval(updateCountdown, 1000);
+            updateCountdown();
+        }
+        
+        // Handle resend click
+        resendLink.addEventListener('click', async (e) => {
+            if (resendLink.classList.contains('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            
+            e.preventDefault();
+            
+            try {
+                resendLink.classList.add('disabled');
+                timeLeft = 60;
+                countdownElement.style.display = 'block';
+                timer = setInterval(updateCountdown, 1000);
+                updateCountdown();
+                
+                const response = await fetch(e.target.href);
+                if (!response.ok) throw new Error('Resend failed');
+                
+                // Show success message
+                const successEvent = new CustomEvent('showToast', {
+                    detail: { message: 'New OTP sent successfully!', type: 'success' }
+                });
+                document.dispatchEvent(successEvent);
+            } catch (error) {
+                console.error('Resend error:', error);
+                const errorEvent = new CustomEvent('showToast', {
+                    detail: { message: 'Failed to resend OTP. Please try again.', type: 'error' }
+                });
+                document.dispatchEvent(errorEvent);
+                resendLink.classList.remove('disabled');
+                clearInterval(timer);
+                countdownElement.style.display = 'none';
+            }
+        });
+        
+        // Auto-submit when OTP is complete
+        otpDigits[5].addEventListener('input', () => {
+            if (combinedOtp.value.length === 6) {
+                document.getElementById('otpForm').submit();
+            }
+        });
+        
+        // Handle max retries case
+        {% if max_retries %}
+            timeLeft = 60;
+            updateCountdown();
+            countdownElement.style.display = 'block';
+            resendLink.classList.add('disabled');
+            timer = setInterval(updateCountdown, 1000);
+        {% endif %}
+    });
+</script>
+{% endblock %}

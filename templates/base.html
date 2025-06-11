@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BloodConnect - Connecting blood donors with recipients for timely life-saving donations">
+    <title>{% block title %}BloodConnect{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --secondary: #4caf50;
+            --light: #f5f5f5;
+            --dark: #333;
+            --gray: #757575;
+            --white: #ffffff;
+            --danger: #ff5252;
+            --warning: #ffc107;
+            --success: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <a href="{{ url_for('index') }}" aria-label="BloodConnect Home">
+                    <span class="logo-text">BloodConnect</span>
+                </a>
+                <button class="navbar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <div class="navbar-menu">
+                <div class="navbar-links">
+                    {% if current_user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="dropdown-toggle" aria-label="User menu">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ current_user.name }} ({{ current_user.role }})</span>
+                            <i class="fas fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                            <a href="{{ url_for('privacy') }}"><i class="fas fa-user"></i> Profile</a>
+                            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    <a href="{{ url_for('signup') }}" class="nav-link btn-primary"><i class="fas fa-user-plus"></i> Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Flash Messages -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}" role="alert">
+                        <span>{{ message }}</span>
+                        <button class="flash-close" aria-label="Close message">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-copyright">
+                &copy; 2025 BloodConnect. All rights reserved.
+                <div class="footer-links">
+                    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                    <a href="{{ url_for('terms') }}">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-social">
+                <a href="https://facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://linkedin.com" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

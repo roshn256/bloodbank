@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | BloodConnect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --secondary: #4caf50;
+            --light: #f5f5f5;
+            --dark: #333;
+            --gray: #757575;
+            --white: #ffffff;
+            --danger: #ff5252;
+            --warning: #ffc107;
+            --success: #4caf50;
+            --bg-gradient: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+            --card-shadow: 0 15px 30px rgba(229, 57, 53, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Entrance Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .left-column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            animation: fadeInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .right-column {
+            flex: 1;
+            background: var(--bg-gradient);
+            padding: 4rem 5%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: fadeInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .signup-card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .signup-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .signup-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .signup-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.2s; }
+        .form-group:nth-child(2) { animation-delay: 0.3s; }
+        .form-group:nth-child(3) { animation-delay: 0.4s; }
+        .form-group:nth-child(4) { animation-delay: 0.5s; }
+        .form-group:nth-child(5) { animation-delay: 0.6s; }
+        .form-group:nth-child(6) { animation-delay: 0.7s; }
+        .form-group:nth-child(7) { animation-delay: 0.8s; }  /* Added for blood group */
+        .form-group:nth-child(8) { animation-delay: 0.9s; }  /* Added for location */
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 45px;
+            color: var(--gray);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .error-message.show {
+            max-height: 50px;
+        }
+
+        .location-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .location-container .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .location-btn {
+            background: var(--light);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .location-btn:hover {
+            background: #eee;
+            border-color: var(--gray);
+        }
+
+        .terms {
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+
+        .terms input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            margin-top: 3px;
+        }
+
+        .terms label {
+            font-size: 0.95rem;
+            color: var(--gray);
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .terms a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .signup-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 57, 53, 0.3);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alternate-links {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .alternate-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0 0.5rem;
+        }
+
+        .alternate-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Right Column - Welcome Content */
+        .welcome-content {
+            color: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        .welcome-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .welcome-content p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+
+        .features-list {
+            margin-top: 1rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin: 1.8rem 0;
+            font-size: 1.1rem;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .feature-icon {
+            background: rgba(255, 255, 255, 0.15);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Decorative Elements */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -150px;
+        }
+
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .circle-3 {
+            width: 150px;
+            height: 150px;
+            top: 40%;
+            left: 50px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            .left-column {
+                padding: 4rem 2rem;
+            }
+            .right-column {
+                padding: 4rem 2rem;
+            }
+            .signup-card {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .signup-card {
+                padding: 1.5rem;
+            }
+            .location-container {
+                flex-direction: column;
+            }
+            .location-btn {
+                padding: 0.8rem;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-column">
+            <div class="signup-card">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                        {{ message }}
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <div class="signup-header">
+                    <h1>Create Account</h1>
+                    <p>Join BloodConnect to donate or request blood and save lives</p>
+                </div>
+                
+                <form id="signupForm" method="POST" action="{{ url_for('signup') }}">
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="text" name="name" id="fullName" placeholder="John Doe" required>
+                        <div class="error-message" id="nameError">
+                            {% if errors and errors.full_name %}
+                                {{ errors.full_name }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <input type="email" name="email" id="email" placeholder="john@example.com" required>
+                        <div class="error-message" id="emailError">
+                            {% if errors and errors.email %}
+                                {{ errors.email }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <div class="input-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <input type="tel" name="phone" id="phone" placeholder="+1 (123) 456-7890" required>
+                        <div class="error-message" id="phoneError">
+                            {% if errors and errors.phone %}
+                                {{ errors.phone }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password">Password (min 8 characters)</label>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" name="password" id="password" placeholder="••••••••" required minlength="8">
+                        <div class="error-message" id="passwordError">
+                            {% if errors and errors.password %}
+                                {{ errors.password }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" name="confirm_password" id="confirmPassword" placeholder="••••••••" required>
+                        <div class="error-message" id="confirmPasswordError">
+                            {% if errors and errors.confirm_password %}
+                                {{ errors.confirm_password }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Role -->
+                    <div class="form-group">
+                        <label for="role">I am a</label>
+                        <div class="input-icon">
+                            <i class="fas fa-user-tag"></i>
+                        </div>
+                        <select name="role" id="role" required>
+                            <option value="" disabled selected>Select your role</option>
+                            <option value="donor">Blood Donor</option>
+                            <option value="organization">Organization</option>
+                            <option value="hospital">Hospital</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        <div class="error-message" id="roleError">
+                            {% if errors and errors.role %}
+                                {{ errors.role }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Blood Group (Added) -->
+                    <div class="form-group">
+                        <label for="bloodGroup">Blood Group (Optional)</label>
+                        <div class="input-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <select name="blood_group" id="bloodGroup">
+                            <option value="" selected>Select your blood group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="other">Prefer not to say</option>
+                        </select>
+                        <div class="error-message" id="bloodGroupError">
+                            {% if errors and errors.blood_group %}
+                                {{ errors.blood_group }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label for="latitude">Location (Optional)</label>
+                        <div class="location-container">
+                            <div class="form-group">
+                                <input type="number" step="any" name="lat" id="latitude" placeholder="Latitude">
+                            </div>
+                            <div class="form-group">
+                                <input type="number" step="any" name="lng" id="longitude" placeholder="Longitude">
+                            </div>
+                            <button type="button" class="location-btn" id="locationBtn">
+                                <i class="fas fa-location-dot"></i>
+                                <span>Use My Location</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms -->
+                    <div class="terms">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">I agree to the <a href="{{ url_for('privacy') }}" target="_blank">Privacy Policy</a> and 
+                            <a href="{{ url_for('terms') }}" target="_blank">Terms of Service</a></label>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="signup-btn" id="submitBtn">
+                        <span class="loading-spinner"></span>
+                        <span class="button-text">Sign Up & Verify OTP</span>
+                    </button>
+                </form>
+                
+                <!-- Alternate Links -->
+                <div class="alternate-links">
+                    Already have an account? <a href="{{ url_for('login') }}">Log In</a><br>
+                    Or <a href="{{ url_for('mobile_login') }}">sign up with your phone</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-column">
+            <!-- Decorative Circles -->
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+            
+            <div class="welcome-content">
+                <h2>Join Our Life-Saving Community</h2>
+                <p>BloodConnect brings together donors, hospitals, and organizations to ensure no one suffers due to lack of blood.</p>
+                
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart-pulse"></i>
+                        </div>
+                        <div>Immediate access to blood donors when needed</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-heart"></i>
+                        </div>
+                        <div>Verified donors and secure donation process</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div>Real-time notifications for urgent requests</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div>Track your donations and impact over time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Feature item animations
+        const features = document.querySelectorAll('.feature-item');
+        features.forEach((feature, index) => {
+            setTimeout(() => {
+                feature.classList.add('visible');
+            }, 300 * (index + 1));
+        });
+
+        // Geolocation functionality
+        document.getElementById('locationBtn').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+                        document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+                        this.innerHTML = '<i class="fas fa-location-dot"></i> Location Found';
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-location-dot"></i> Use My Location';
+                        }, 3000);
+                    },
+                    (error) => {
+                        console.error('Geolocation error:', error);
+                        this.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Failed to get location';
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-location-dot"></i> Use My Location';
+                        }, 3000);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        });
+
+        // Form submission handling
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.loading-spinner').style.display = 'inline-block';
+            submitBtn.querySelector('.button-text').textContent = 'Processing...';
+            
+            // Password validation
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+                document.getElementById('confirmPasswordError').classList.add('show');
+                
+                submitBtn.disabled = false;
+                submitBtn.querySelector('.loading-spinner').style.display = 'none';
+                submitBtn.querySelector('.button-text').textContent = 'Sign Up & Verify OTP';
+            }
+            
+            // Additional validation can be added here
+        });
+
+        // Show error messages if they exist on page load
+        document.querySelectorAll('.error-message').forEach(el => {
+            if (el.textContent.trim() !== '') {
+                el.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+Flask
+tensorflow
+opencv-python
+numpy
+pillow
+pyaudio
+pynput
+flask-socketio
+pymongo
+python-dotenv
+reportlab
+flask
+flask-sqlalchemy
+gunicorn

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BloodConnect | Emergency Alert</title>
+    
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --primary-dark: #b71c1c;
+            --primary-light: #ffebee;
+            --secondary: #4caf50;
+            --accent: #ff9800;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #4caf50;
+            --warning: #ffc107;
+            --danger: #f44336;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f9fafc;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .welcome-section h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .welcome-section p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.25);
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #9e1616);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(211, 47, 47, 0.35);
+        }
+
+        .emergency-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .emergency-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .emergency-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 2rem;
+            color: var(--primary-dark);
+        }
+
+        .emergency-icon {
+            background-color: var(--primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .alert-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-top: 4px solid var(--primary);
+        }
+
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-section {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--light-gray);
+        }
+
+        .preview-row {
+            display: flex;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--light-gray);
+        }
+
+        .preview-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .preview-label {
+            width: 180px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .preview-value {
+            flex: 1;
+            font-size: 1.1rem;
+            color: var(--dark);
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--light-gray);
+        }
+
+        .blood-group-tag {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+        }
+
+        .actions-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 2px solid transparent;
+        }
+
+        .cancel-btn {
+            background: white;
+            color: var(--gray);
+            border-color: var(--light-gray);
+        }
+
+        .cancel-btn:hover {
+            background: var(--light-gray);
+            transform: translateY(-2px);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+
+        .send-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #9e1616);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(211, 47, 47, 0.4);
+        }
+
+        .warning-section {
+            background: #fff8e1;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 4px solid var(--warning);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .warning-icon {
+            color: var(--warning);
+            font-size: 1.5rem;
+            margin-top: 3px;
+        }
+
+        .warning-text {
+            flex: 1;
+        }
+
+        .warning-text h3 {
+            font-family: 'Poppins', sans-serif;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .warning-text p {
+            color: #856404;
+            line-height: 1.5;
+        }
+
+        /* Confirmation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transform: scale(0.95);
+            animation: modalAppear 0.3s forwards;
+        }
+
+        @keyframes modalAppear {
+            to { transform: scale(1); }
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-icon {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .modal-body p {
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            background: var(--light);
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            font-size: 1rem;
+            min-width: 120px;
+        }
+
+        .modal-cancel {
+            background: white;
+            color: var(--gray);
+            border-color: var(--light-gray);
+        }
+
+        .modal-cancel:hover {
+            background: var(--light-gray);
+        }
+
+        .modal-confirm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-confirm:hover {
+            background: var(--primary-dark);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--light-gray);
+            margin-top: 30px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .preview-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .preview-label {
+                width: 100%;
+            }
+            
+            .actions-container {
+                flex-direction: column;
+            }
+            
+            .emergency-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h1>Emergency Blood Request</h1>
+                <p>Send critical alerts to nearby donors</p>
+            </div>
+            <button class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <!-- Emergency Alert Content -->
+        <div class="emergency-container">
+            <div class="emergency-header">
+                <div class="emergency-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h2>Send Critical Alert to Nearby Donors</h2>
+            </div>
+
+            <!-- Warning Section -->
+            <div class="warning-section">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="warning-text">
+                    <h3>Important Notice</h3>
+                    <p>Emergency alerts should only be used for critical, life-threatening situations. This notification will be sent to all eligible donors within a 20-mile radius. Please confirm all details before sending.</p>
+                </div>
+            </div>
+
+            <!-- Alert Preview Card -->
+            <div class="alert-card">
+                <h3 class="card-title">
+                    <i class="fas fa-eye"></i> Alert Preview
+                </h3>
+                
+                <div class="preview-section">
+                    <div class="preview-row">
+                        <div class="preview-label">Blood Group Required:</div>
+                        <div class="preview-value">
+                            <span class="blood-group-tag">O+</span> 
+                            <span class="blood-group-tag">O-</span>
+                            (Universal Donors)
+                        </div>
+                    </div>
+                    
+                    <div class="preview-row">
+                        <div class="preview-label">Location:</div>
+                        <div class="preview-value">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            City General Hospital, 123 Medical Drive
+                        </div>
+                    </div>
+                    
+                    <div class="preview-row">
+                        <div class="preview-label">Notification Radius:</div>
+                        <div class="preview-value">
+                            <i class="fas fa-location-circle"></i> 
+                            20 miles
+                        </div>
+                    </div>
+                    
+                    <div class="preview-row">
+                        <div class="preview-label">Urgency Level:</div>
+                        <div class="preview-value" style="color: var(--primary-dark); font-weight: 600;">
+                            <i class="fas fa-heartbeat"></i> 
+                            Critical - Life Threatening
+                        </div>
+                    </div>
+                    
+                    <div class="preview-row">
+                        <div class="preview-label">Message to Donors:</div>
+                        <div class="preview-value" style="font-style: italic;">
+                            "URGENT: Critical need for O+ and O- blood at City General Hospital. Multiple trauma patients requiring immediate transfusion. Please come to the blood donation center ASAP. Your donation can save lives!"
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="actions-container">
+                    <button class="action-btn cancel-btn" id="cancelBtn">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                    <button class="action-btn send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i> Send Emergency Alert
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <p>BloodConnect &copy; 2023 | Emergency Alert System</p>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Emergency Alert</h3>
+            </div>
+            <div class="modal-body">
+                <div class="modal-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <p>Are you sure you want to send this emergency alert to <strong>187 eligible donors</strong> within a 20-mile radius?</p>
+                <p>This action cannot be undone and should only be used for critical situations.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-cancel" id="modalCancel">Cancel</button>
+                <button class="modal-btn modal-confirm" id="modalConfirm">Send Alert</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--success);">
+                <h3>Alert Sent Successfully!</h3>
+            </div>
+            <div class="modal-body">
+                <div class="modal-icon" style="color: var(--success);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <p>Your emergency alert has been sent to <strong>187 nearby donors</strong>.</p>
+                <p>Donors have been notified and are on their way. Thank you for your urgent action!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-confirm" id="successConfirm" style="background: var(--success);">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const sendBtn = document.getElementById('sendBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const successModal = document.getElementById('successModal');
+        const modalCancel = document.getElementById('modalCancel');
+        const modalConfirm = document.getElementById('modalConfirm');
+        const successConfirm = document.getElementById('successConfirm');
+        
+        // Event Listeners
+        sendBtn.addEventListener('click', () => {
+            confirmationModal.style.display = 'flex';
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            window.location.href = 'dashboard.html'; // In a real app, this would navigate back
+        });
+        
+        modalCancel.addEventListener('click', () => {
+            confirmationModal.style.display = 'none';
+        });
+        
+        modalConfirm.addEventListener('click', () => {
+            confirmationModal.style.display = 'none';
+            // Simulate sending delay
+            setTimeout(() => {
+                successModal.style.display = 'flex';
+            }, 800);
+        });
+        
+        successConfirm.addEventListener('click', () => {
+            successModal.style.display = 'none';
+            // In a real app, would redirect to dashboard or show confirmation
+            alert('Emergency alert sent successfully! Returning to dashboard...');
+        });
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === confirmationModal) {
+                confirmationModal.style.display = 'none';
+            }
+            if (e.target === successModal) {
+                successModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

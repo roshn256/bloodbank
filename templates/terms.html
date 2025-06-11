@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Terms of Service | BloodConnect{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+  <h1>Terms of Service</h1>
+  <p>Welcome to BloodConnect. By using our platform, you agree to the following terms and conditions:</p>
+  <ol>
+    <li><strong>Use of Service:</strong> You must be at least 18 years old to register. BloodConnect is not a substitute for professional medical advice.</li>
+    <li><strong>User Data:</strong> You are responsible for the accuracy of all information you provide.</li>
+    <li><strong>Privacy:</strong> We collect only the data necessary to connect donors and requesters. See our <a href="{{ url_for('privacy') }}">Privacy Policy</a> for details.</li>
+    <li><strong>Account Security:</strong> You agree to keep your password secure and to notify us of any unauthorized usage.</li>
+    <li><strong>Liability:</strong> BloodConnect is a matcher service and assumes no liability for the outcome of any donation or request.</li>
+    <!-- Add any other specific clauses required for your project -->
+  </ol>
+  <p>Last updated: June 7, 2025</p>
+</div>
+{% endblock %}
